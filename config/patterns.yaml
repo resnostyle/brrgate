@@ -1,0 +1,11 @@
+match_field: torrent
+default_ignore_case: true
+
+patterns:
+  - name: flac-anywhere
+    substring: FLAC
+  - name: four-k-remux
+    glob: "*2160p*REMUX*"
+  - name: strict-artist-regex
+    regex: '^MyArtist\.Weekly.*1080p'
+    ignore_case: false

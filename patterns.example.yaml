@@ -1,3 +1,4 @@
+# Example rules (mirrors config/patterns.yaml). Copy to customise your deployment.
 match_field: torrent
 default_ignore_case: true
 

@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"autobrr-hook/internal/hub"
-	"autobrr-hook/internal/logx"
-	"autobrr-hook/internal/patterns"
-	"autobrr-hook/internal/state"
+	"brrgate/internal/hub"
+	"brrgate/internal/logx"
+	"brrgate/internal/patterns"
+	"brrgate/internal/state"
 )
 
 const maxWebhookPayload = 1 << 17 // 128 KiB

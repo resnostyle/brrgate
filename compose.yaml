@@ -1,19 +1,22 @@
 services:
-  autobrr-hook:
+  brrgate:
     build:
       context: .
       dockerfile: Dockerfile
-    image: autobrr-hook:local
+    image: brrgate:local
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      # Mounted rules file matches the compose volume below.
-      PATTERNS_FILE: ${PATTERNS_FILE:-/config/patterns.yaml}
+      # Always prefer the compose-mounted path; ignoring host .env relative paths avoids
+      # ./patterns.yaml resolving inside WORKDIR (/home/svc) where nothing is bind-mounted.
+      PATTERNS_FILE: /config/patterns.yaml
       # Listening on all interfaces lets host port mapping reach DEBUG approvals.
       DEBUG_UI_LISTEN_ADDR: 0.0.0.0:8091
     volumes:
-      - ${PATTERNS_PATH:-./patterns.yaml}:/config/patterns.yaml:ro
+      # Mount a host *directory* at /config to avoid Docker creating patterns.yaml as a folder
+      # when single-file binds point at paths that don't exist yet.
+      - ${PATTERNS_DIR:-./config}:/config:ro
     ports:
       - "${PUBLISH_LISTEN:-8080}:8080"
       # Publish the blocking debug dashboard only when DEBUG_APPROVAL=true.

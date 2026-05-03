@@ -1,4 +1,4 @@
-module autobrr-hook
+module brrgate
 
 go 1.22
 

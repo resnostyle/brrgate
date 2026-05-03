@@ -11,11 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"autobrr-hook/internal/config"
-	"autobrr-hook/internal/httpserver"
-	"autobrr-hook/internal/logx"
-	"autobrr-hook/internal/patterns"
-	"autobrr-hook/internal/state"
+	"brrgate/internal/config"
+	"brrgate/internal/httpserver"
+	"brrgate/internal/logx"
+	"brrgate/internal/patterns"
+	"brrgate/internal/state"
 )
 
 func main() {
@@ -47,9 +47,10 @@ func main() {
 	mux := http.NewServeMux()
 	api.RegisterRoutes(mux)
 
+	mainChain := httpserver.WithAccessLog(logger, "webhook", mux)
 	mainSrv := &http.Server{
 		Addr:              cfg.ListenAddr,
-		Handler:           mux,
+		Handler:           mainChain,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
@@ -61,9 +62,10 @@ func main() {
 
 	var debugSrv *http.Server
 	if cfg.DebugApproval {
+		debugChain := httpserver.WithAccessLog(logger, "debug", httpserver.NewDebugHandler(registry))
 		debugSrv = &http.Server{
 			Addr:              cfg.DebugUIListenAddr,
-			Handler:           httpserver.NewDebugHandler(registry),
+			Handler:           debugChain,
 			ReadHeaderTimeout: 5 * time.Second,
 		}
 		go func() {

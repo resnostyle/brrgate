@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"autobrr-hook/internal/state"
+	"brrgate/internal/state"
 )
 
 const dashboardHTML = `<!DOCTYPE html>
@@ -15,7 +15,7 @@ const dashboardHTML = `<!DOCTYPE html>
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>autobrr-hook debug</title>
+	<title>brrgate debug</title>
 	<style>
 		body { font-family: system-ui, sans-serif; margin: 0; background: #0b0d12; color: #e6e9ef; }
 		header { padding: 1rem 1.5rem; border-bottom: 1px solid #1f2430; }
@@ -33,7 +33,7 @@ const dashboardHTML = `<!DOCTYPE html>
 </head>
 <body>
 	<header>
-		<h1 style="margin:0;font-size:1.4rem;">autobrr-hook · manual approvals</h1>
+		<h1 style="margin:0;font-size:1.4rem;">brrgate · manual approvals</h1>
 		<p class="muted" style="margin:0.35rem 0 0;">Updated {{ .Generated }} · bind this UI to loopback in production</p>
 	</header>
 	<main>

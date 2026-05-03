@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"autobrr-hook/internal/hub"
-	"autobrr-hook/internal/patterns"
+	"brrgate/internal/hub"
+	"brrgate/internal/patterns"
 )
 
 // PendingRelease tracks an in-flight debug decision.
