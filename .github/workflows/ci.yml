@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.12"
+          cache: true
+
+      - run: go mod download
+      - run: go vet ./...
+      - run: go test ./...
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare image tags
+        id: prep
+        shell: bash
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          RUN_NUMBER: ${{ github.run_number }}
+          SHA: ${{ github.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          IMAGE="${REGISTRY,,}/${REPOSITORY,,}"
+          echo "image=${IMAGE}" >> "${GITHUB_OUTPUT}"
+
+          if [ "${EVENT_NAME}" = "push" ] && [ "${REF}" = "refs/heads/main" ]; then
+            echo "push=true" >> "${GITHUB_OUTPUT}"
+            echo "tags=${IMAGE}:latest,${IMAGE}:0.0.${RUN_NUMBER}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "push=false" >> "${GITHUB_OUTPUT}"
+            echo "tags=${IMAGE}:ci-${SHA}" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: steps.prep.outputs.push == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (push latest + version tag on main only)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ steps.prep.outputs.push == 'true' }}
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

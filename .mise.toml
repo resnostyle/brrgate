@@ -1,0 +1,29 @@
+# https://mise.jdx.dev — install tooling and run scripted tasks consistently.
+#
+# Typical usage:
+#   mise install           # installs Go toolchain
+#   mise run ci            # vet + tests
+#   mise run docker:build # local image tagged brrgate:local
+
+[tools]
+# Keep in sync with the builder stage in Dockerfile and the Go directive in go.mod.
+go = "1.22.12"
+
+[tasks.ci]
+depends = ["check"]
+
+[tasks.check]
+description = "Run go vet followed by tests"
+run = "go vet ./... && go test ./..."
+
+[tasks."docker:build"]
+description = "Build the production container image locally"
+run = "DOCKER_BUILDKIT=1 docker build -t brrgate:local ."
+
+[tasks."docker:compose:up"]
+description = "Start the Compose stack defined in compose.yaml"
+run = "DOCKER_BUILDKIT=1 docker compose up --build"
+
+[tasks."docker:compose:down"]
+description = "Stop the Compose stack defined in compose.yaml"
+run = "DOCKER_BUILDKIT=1 docker compose down"

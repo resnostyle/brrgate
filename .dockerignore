@@ -1,0 +1,12 @@
+**/brrgate
+**/dist/
+
+.git
+.idea
+.cursor
+.vscode
+.DS_Store
+
+.env
+.env.*
+!.env.example
