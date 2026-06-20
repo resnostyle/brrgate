@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 ## Lightweight runtime surface with CA bundle for outbound HTTPS callers.
 ##
 
-FROM alpine:3.20
+FROM alpine:3.24
 
 LABEL org.opencontainers.image.title="brrgate"
 
