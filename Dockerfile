@@ -2,7 +2,7 @@
 ## Build statically linked linux binaries without cgo deps (multi-arch friendly).
 ##
 
-FROM golang:1.22.12-bookworm AS build
+FROM golang:1.26.5-bookworm AS build
 
 WORKDIR /src
 
